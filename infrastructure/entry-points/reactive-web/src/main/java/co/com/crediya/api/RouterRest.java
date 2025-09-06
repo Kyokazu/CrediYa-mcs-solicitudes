@@ -1,5 +1,8 @@
 package co.com.crediya.api;
 
+import co.com.crediya.api.config.LoanPath;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -10,11 +13,18 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
+@Slf4j
+@RequiredArgsConstructor
 public class RouterRest {
+
+    private final LoanPath loanPath;
+    private final Handler loanHandler;
+
     @Bean
-    public RouterFunction<ServerResponse> routerFunction(Handler handler) {
-        return route(GET("/api/usecase/path"), handler::listenGETUseCase)
-                .andRoute(POST("/api/usecase/otherpath"), handler::listenPOSTUseCase)
-                .and(route(GET("/api/otherusercase/path"), handler::listenGETOtherUseCase));
+    public RouterFunction<ServerResponse> routerFunction() {
+        return route()
+                .POST(loanPath.getSaveLoan(), loanHandler::saveLoan)
+                .build();
+
     }
 }

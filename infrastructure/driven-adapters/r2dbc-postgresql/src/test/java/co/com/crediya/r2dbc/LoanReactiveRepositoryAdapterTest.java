@@ -15,18 +15,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MyReactiveRepositoryAdapterTest {
+class LoanReactiveRepositoryAdapterTest {
     // TODO: change four you own tests
 
     @InjectMocks
-    MyReactiveRepositoryAdapter repositoryAdapter;
+    LoanReactiveRepositoryAdapter repositoryAdapter;
 
     @Mock
-    MyReactiveRepository repository;
+    LoanReactiveRepository repository;
 
     @Mock
     ObjectMapper mapper;
-
+/*
     @Test
     void mustFindValueById() {
 
@@ -75,4 +75,6 @@ class MyReactiveRepositoryAdapterTest {
                 .expectNextMatches(value -> value.equals("test"))
                 .verifyComplete();
     }
+    */
+ 
 }

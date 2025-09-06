@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 spring:
   application:
     name: "msc-solicitudes"
@@ -20,5 +20,60 @@ management:
     health:
       probes:
         enabled: true
+  health:
+    circuitbreakers:
+      enabled: true
 cors:
-  allowed-origins: "http://localhost:4200,http://localhost:8080"
+  allowed-origins: "http://localhost:4200,http://localhost:8081"
+springdoc:
+  swagger-ui:
+    path: "/api/doc/swagger-ui.html"
+  api-docs:
+    path: "/api/doc/api-docs"
+
+routes:
+  paths:
+    saveLoan: "/api/v1/solicitud"
+
+
+adapters:
+  users:
+    baseUrl: "http://localhost:8080"
+    timeoutMs: "3000"
+    userByIdentification: "/api/v1/users/{identification}"
+
+  r2dbc:
+    host: "localhost"
+    port: 5432
+    database: "msc_solicitudes"
+    schema: "public"
+    username: "admin"
+    password: "adminpassword"
+adapter:
+  restconsumer:
+    timeout: 5000
+    url: "http://localhost:8080"
+
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      testGet:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: "2s"
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 10
+        waitDurationInOpenState: "10s"
+      testPost:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: "2s"
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 10
+        waitDurationInOpenState: "10s"
