@@ -26,6 +26,6 @@ jar {
 }
 
 bootJar {
-    // Sets output jar name
+    enabled = true
     archiveFileName = "${project.getParent().getName()}.${archiveExtension.get()}"
 }

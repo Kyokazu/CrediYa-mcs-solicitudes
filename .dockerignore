@@ -1,0 +1,36 @@
+# =====================
+# Archivos y carpetas de build
+# =====================
+build/
+.gradle/
+out/
+bin/
+target/
+
+# =====================
+# Configuración de IDEs
+# =====================
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+
+# =====================
+# Archivos temporales del sistema
+# =====================
+.DS_Store
+Thumbs.db
+*.log
+
+# =====================
+# Archivos de Git
+# =====================
+.git
+.gitignore
+
+# =====================
+# Otros
+# =====================
+*.class

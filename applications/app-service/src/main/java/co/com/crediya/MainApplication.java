@@ -11,12 +11,8 @@ import java.util.Properties;
 @SpringBootApplication
 @ConfigurationPropertiesScan
 public class MainApplication {
-    public static void main(String[] args) throws IOException {
-        Properties envProps = new Properties();
-        try (FileInputStream fis = new FileInputStream(".env")) {
-            envProps.load(fis);
-        }
-        envProps.forEach((key, value) -> System.setProperty(key.toString(), value.toString()));
+    public static void main(String[] args) {
         SpringApplication.run(MainApplication.class, args);
     }
 }
+
