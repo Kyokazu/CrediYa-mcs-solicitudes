@@ -8,6 +8,7 @@ import org.reactivecommons.utils.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -24,6 +25,11 @@ public class LoanReactiveRepositoryAdapter extends ReactiveAdapterOperations<Loa
     @Override
     public Mono<Loan> saveLoan(Loan loan) {
         return super.save(loan);
-
     }
+
+    @Override
+    public Flux<Loan> findAllPaged(int page, int size) {
+        return super.findAllPaged(page, size);
+    }
+
 }

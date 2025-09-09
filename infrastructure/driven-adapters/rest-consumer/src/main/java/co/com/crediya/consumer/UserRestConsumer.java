@@ -1,7 +1,8 @@
 package co.com.crediya.consumer;
 
 import co.com.crediya.consumer.config.AdaptersPath;
-import co.com.crediya.consumer.dto.UserEmailDTO;
+import co.com.crediya.consumer.dto.UserInfoDTO;
+import co.com.crediya.model.loan.UserLoanInfo;
 import co.com.crediya.model.loan.gateways.UserGateway;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,16 +22,24 @@ public class UserRestConsumer implements UserGateway {
         return usersWebClient.get()
                 .uri(adaptersPath.getUserByIdentification(), identification)
                 .retrieve()
-                .bodyToMono(UserEmailDTO.class)
-                .map(UserEmailDTO::getEmail);
+                .bodyToMono(UserInfoDTO.class)
+                .map(UserInfoDTO::getEmail);
     }
 
     @Override
-    public Mono<String> validateUserIdentityWithToken() {
+    public Mono<UserLoanInfo> getLoanRequesterInfo(String email) {
         return usersWebClient.get()
-                .uri(adaptersPath.getValidateToken()
-                        .b);
+                .uri(adaptersPath.getUserByEmail(), email)
+                .retrieve()
+                .bodyToMono(UserInfoDTO.class)
+                .map(dto -> UserLoanInfo.builder()
+                        .email(dto.getEmail())
+                        .name(dto.getName())
+                        .income(dto.getIncome())
+                        .build()
+                );
     }
+
 
 
 

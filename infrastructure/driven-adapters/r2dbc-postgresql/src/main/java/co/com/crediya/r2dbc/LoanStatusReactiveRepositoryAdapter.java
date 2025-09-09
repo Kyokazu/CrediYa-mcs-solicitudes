@@ -34,5 +34,16 @@ public class LoanStatusReactiveRepositoryAdapter extends ReactiveAdapterOperatio
                 .doOnSuccess(id -> log.info("📌 Loan Status name= {} -> Loan Status id= {}", name, id));
 
     }
+
+    @Override
+    public Mono<String> getNameById(UUID id) {
+        LoanStatus loan = LoanStatus.builder()
+                .id(id).build();
+        return super.findByExample(loan)
+                .next()
+                .map(LoanStatus::getName)
+                .doOnSuccess(name -> log.info("📌 Loan Status name= {} -> Loan Status id= {}", name, id));
+
+    }
 }
 

@@ -33,8 +33,12 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
         return data != null ? toEntityFn.apply(data) : null;
     }
 
-
-
+    public Flux<E> findAllPaged(int page, int size) {
+        return repository.findAll()
+                .skip((long) page * size)
+                .take(size)
+                .map(this::toEntity);
+    }
 
     public Mono<E> save(E entity) {
         return saveData(toData(entity))

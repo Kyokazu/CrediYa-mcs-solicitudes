@@ -12,4 +12,6 @@ public class AdaptersPath {
     private String baseUrl;
     private String timeoutMs;
     private String userByIdentification;
+    private String userByEmail;
+    private String validateToken;
 }

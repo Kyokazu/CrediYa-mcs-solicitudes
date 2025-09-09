@@ -1,7 +1,14 @@
+# Etapa de construcción
+FROM gradle:8.10.2-jdk21-alpine AS builder
+WORKDIR /home/gradle/project
+COPY . .
+RUN gradle clean build -x test --no-daemon
+
+# Etapa de ejecución
 FROM eclipse-temurin:21-jdk-alpine
-VOLUME /tmp
-COPY *.jar msc-solicitudes.jar
-ENV JAVA_OPTS=" -Xshareclasses:name=cacheapp,cacheDir=/cache,nonfatal -XX:+UseContainerSupport -XX:MaxRAMPercentage=70 -Djava.security.egd=file:/dev/./urandom"
-# Replace with a non-root user to avoid running the container with excessive privileges
-USER appuser
-ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS  -jar msc-solicitudes.jar" ]
+WORKDIR /app
+
+# Copiamos el JAR desde la carpeta raíz build/libs
+COPY --from=builder /home/gradle/project/build/libs/*.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

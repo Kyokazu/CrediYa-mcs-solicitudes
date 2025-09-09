@@ -34,4 +34,25 @@ public class LoanTypeReactiveRepositoryAdapter extends ReactiveAdapterOperations
                 .doOnSuccess(id -> log.info("📌 Loan Type name= {} -> Loan Type id= {}", name, id));
 
     }
+
+    @Override
+    public Mono<LoanType> getLoanTypeById(UUID id) {
+        LoanType loan = LoanType.builder()
+                .id(id)
+                .build();
+        return super.findByExample(loan)
+                .next()
+                .map(loanType -> {
+                    return LoanType.builder()
+                            .id(loanType.getId())
+                            .name(loanType.getName())
+                            .interestRate(loanType.getInterestRate())
+                            .automaticValidation(loanType.getAutomaticValidation())
+                            .maximumAmount(loanType.getMaximumAmount())
+                            .minimumAmount(loanType.getMinimumAmount())
+                            .build();
+                })
+                .doOnSuccess(name -> log.info("📌 Loan Type name= {} -> Loan Type id= {}", name, id));
+
+    }
 }
