@@ -4,6 +4,7 @@ package co.com.crediya.model.loan;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 @Builder(toBuilder = true)
 public class UserLoanInfo {
 
+    private UUID id;
     private BigDecimal amount;
     private Long duration;
     private String email;

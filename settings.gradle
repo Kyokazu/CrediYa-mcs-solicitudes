@@ -28,3 +28,5 @@ include ':rest-consumer'
 project(':rest-consumer').projectDir = file('./infrastructure/driven-adapters/rest-consumer')
 include ':jwt-service'
 project(':jwt-service').projectDir = file('./infrastructure/driven-adapters/jwt-service')
+include ':aws-sqs'
+project(':aws-sqs').projectDir = file('./infrastructure/driven-adapters/aws-sqs')

@@ -1,0 +1,8 @@
+dependencies {
+    implementation project(':model')
+    implementation 'org.springframework:spring-context'
+    implementation "software.amazon.awssdk:sqs:$awsSdkVersion"
+    implementation "software.amazon.awssdk:netty-nio-client:$awsSdkVersion"
+    implementation "software.amazon.awssdk:sts:$awsSdkVersion"
+
+}

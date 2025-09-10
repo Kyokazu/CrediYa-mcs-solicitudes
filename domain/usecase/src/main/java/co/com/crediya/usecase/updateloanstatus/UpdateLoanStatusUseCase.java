@@ -20,10 +20,16 @@ public class UpdateLoanStatusUseCase {
     private final LoanStatusRepository loanStatusRepository;
     private final JwtGateway jwtGateway;
     private final UserGateway userGateway;
+    private final NotificationQueueGateway notificationQueueGateway;
 
     public Mono<Loan> updateLoanStatus(Loan loan, String token) {
         return validateUserWithToken(token)
-                .then(findUUIDWithStatusName(loan.getEmail()))
+                .then(getUpdatedLoan(loan))
+                .flatMap(this::notifyAndReturnLoan);
+    }
+
+    private Mono<Loan> getUpdatedLoan(Loan loan) {
+        return findUUIDWithStatusName(loan.getEmail())
                 .flatMap(statusId ->
                         loanRepository.findById(loan.getId())
                                 .flatMap(existingLoan -> {
@@ -33,12 +39,17 @@ public class UpdateLoanStatusUseCase {
                 );
     }
 
-    private Mono<UUID> findUUIDWithStatusName(String email) {
-        return loanStatusRepository.getIdByName(email);
+    private Mono<Loan> notifyAndReturnLoan(Loan updatedLoan) {
+        return mapToUserLoanInfo(updatedLoan)
+                .flatMap(userLoanInfo -> {
+                    String message = buildLoanStatusMessage(userLoanInfo);
+                    return notificationQueueGateway.sendMessage(userLoanInfo.getEmail(), message)
+                            .thenReturn(updatedLoan);
+                });
     }
 
-    private Mono<Void> sendSQSNotification(Loan loan) {
-
+    private Mono<UUID> findUUIDWithStatusName(String statusName) {
+        return loanStatusRepository.getIdByName(statusName);
     }
 
     private Mono<UserLoanInfo> mapToUserLoanInfo(Loan loan) {
@@ -96,6 +107,17 @@ public class UpdateLoanStatusUseCase {
                 ? BigDecimal.ZERO
                 : numerator.divide(denominator, 2, RoundingMode.HALF_UP);
     }
+
+    private String buildLoanStatusMessage(UserLoanInfo info) {
+        return String.format(
+                "Your %s loan request for an amount of %s in a duration of %s months, has been %s.",
+                info.getLoanType(),
+                info.getAmount(),
+                info.getDuration(),
+                info.getLoanStatus()
+        );
+    }
+
 
 }
 

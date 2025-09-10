@@ -53,7 +53,14 @@ adapters:
     password: "adminpassword"
 
 jwt:
-  secret: dGhpcy1pcy1hLXRlc3Qtc2VjcmV0LWZvci1kZXZlbG9wbWVudC1vbmx5LWRvLW5vdC11c2UtaW4tcHJvZHVjdGlvbi1lbnZpcm9ubWVudA==
+  secret: ${JWT_SECRET}
+
+aws:
+  access-key: ${AWS_ACCESS_KEY_ID}
+  secret-key: ${AWS_SECRET_ACCESS_KEY}
+  sqs:
+    queue-url: ${AWS_SQS_URL}
+    region: ${AWS_REGION}
 
 resilience4j:
   circuitbreaker:

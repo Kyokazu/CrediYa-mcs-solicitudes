@@ -57,6 +57,7 @@ public class ManualLoanReviewUseCase {
                     );
 
                     return baseUserInfo.toBuilder()
+                            .id(loan.getId())
                             .amount(loan.getAmount())
                             .duration(loan.getDuration())
                             .loanType(loanType.getName())

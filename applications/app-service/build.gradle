@@ -1,6 +1,7 @@
 apply plugin: 'org.springframework.boot'
 
 dependencies {
+	implementation project(':aws-sqs')
 	implementation project(':jwt-service')
 	implementation project(':rest-consumer')
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
