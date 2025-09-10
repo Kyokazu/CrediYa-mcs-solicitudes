@@ -32,4 +32,9 @@ public class LoanReactiveRepositoryAdapter extends ReactiveAdapterOperations<Loa
         return super.findAllPaged(page, size);
     }
 
+    @Override
+    public Mono<Loan> findById(UUID id) {
+        return super.findById(id);
+    }
+
 }

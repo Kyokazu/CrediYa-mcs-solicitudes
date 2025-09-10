@@ -49,4 +49,19 @@ public class LoanApiDoc {
                                 .mediaType(MediaType.APPLICATION_JSON_VALUE)
                                 .schema(schemaBuilder().type("string"))));
     }
+
+    public Builder updateLoanDoc(Builder builder) {
+        return builder
+                .operationId("updateLoan")
+                .description("Update loan")
+                .tag("Loan")
+                .response(responseBuilder().responseCode("200").description("Loans retrieved successfully")
+                        .content(contentBuilder()
+                                .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder().implementation(LoanDTO.class))))
+                .response(responseBuilder().responseCode("404").description("No loans found")
+                        .content(contentBuilder()
+                                .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder().type("string"))));
+    }
 }

@@ -24,6 +24,7 @@ public class RouterRest {
         return route()
                 .POST(loanPath.getLoan(), loanHandler::saveLoan, LoanApiDoc::saveLoanDoc)
                 .GET(loanPath.getLoan(), loanHandler::getLoan, LoanApiDoc::getLoanDoc)
+                .PUT(loanPath.getLoan(), loanHandler::updateLoan, LoanApiDoc::updateLoanDoc)
                 .build();
 
     }

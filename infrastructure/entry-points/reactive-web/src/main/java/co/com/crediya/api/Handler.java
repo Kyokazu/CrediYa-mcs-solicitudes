@@ -2,6 +2,7 @@ package co.com.crediya.api;
 
 import co.com.crediya.api.dto.LoanDTO;
 import co.com.crediya.api.dto.LoanDetailsDTO;
+import co.com.crediya.api.dto.UpdateLoanDTO;
 import co.com.crediya.api.exception.MissingInvalidAuthHeaderException;
 import co.com.crediya.api.exception.ValidationException;
 import co.com.crediya.api.util.ValidatorUtil;
@@ -9,6 +10,7 @@ import co.com.crediya.model.loan.Loan;
 import co.com.crediya.model.loan.UserLoanInfo;
 import co.com.crediya.usecase.manualloanreview.ManualLoanReviewUseCase;
 import co.com.crediya.usecase.requestloan.RequestLoanUseCase;
+import co.com.crediya.usecase.updateloanstatus.UpdateLoanStatusUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +34,7 @@ public class Handler {
     private final TransactionalOperator txOperator;
     private final RequestLoanUseCase requestLoanUseCase;
     private final ManualLoanReviewUseCase manualLoanReviewUseCase;
+    private final UpdateLoanStatusUseCase updateLoanStatusUseCase;
 
     public Mono<ServerResponse> saveLoan(ServerRequest request) {
         log.info("Received request to save loan");
@@ -45,6 +48,7 @@ public class Handler {
     }
 
     public Mono<ServerResponse> getLoan(ServerRequest request) {
+        log.info("Received request to get loan");
         return extractToken(request)
                 .flatMap(token -> {
                     PageRequest pageRequest = extractPageRequest(request);
@@ -68,6 +72,17 @@ public class Handler {
                 .onErrorResume(ValidationException.class, this::handleValidationException)
                 .doOnError(err -> log.error("❌ Unexpected error while fetching loans: {}", err.getMessage(), err));
     }
+
+    public Mono<ServerResponse> updateLoan(ServerRequest request) {
+        log.info("Received request to update loan");
+        return extractToken(request)
+                .flatMap(token -> updateLoanStatus(request, token))
+                .as(txOperator::transactional)
+                .flatMap(this::buildSuccessResponse)
+                .onErrorResume(ValidationException.class, this::handleValidationException)
+                .doOnError(err -> log.error("Unexpected error while updating loan: {}", err.getMessage(), err));
+    }
+
 
     private LoanDetailsDTO mapToLoanDetailsDTO(UserLoanInfo userLoanInfo) {
         LoanDetailsDTO dto = new LoanDetailsDTO();
@@ -116,6 +131,22 @@ public class Handler {
                     log.debug("🔄 Mapped LoanDTO to Loan: {}", loan);
                     return requestLoanUseCase.saveLoan(loan, dto.getLoanType(), token);
                 });
+    }
+
+    private Mono<Loan> updateLoanStatus(ServerRequest request, String token) {
+        return request.bodyToMono(UpdateLoanDTO.class)
+                .doOnNext(dto -> log.info("📥 LoanDTO received: {}", dto))
+                .flatMap(validatorUtil::validate)
+                .doOnSuccess(dto -> log.info("✅ Validation successful for DTO with identification {}", dto.getId()))
+                .flatMap(dto -> {
+                    Loan loan = Loan.builder()
+                            .id(dto.getId())
+                            .email(dto.getStatus()).build();
+                    log.debug("🔄 Mapped LoanDTO to Loan: {}", loan);
+                    return updateLoanStatusUseCase.updateLoanStatus(loan, token);
+                });
+
+
     }
 
     private Loan mapToLoan(LoanDTO dto) {

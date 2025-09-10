@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class LoanDetailsDTO {
 
+    private UUID id;
     private BigDecimal amount;
     private Long duration;
     private String email;
