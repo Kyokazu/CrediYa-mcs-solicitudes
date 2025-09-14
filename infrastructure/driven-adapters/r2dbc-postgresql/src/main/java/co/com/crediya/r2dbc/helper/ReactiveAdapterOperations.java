@@ -8,6 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.UUID;
 import java.util.function.Function;
 
 public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudRepository<D, I> & ReactiveQueryByExampleExecutor<D>> {
@@ -59,7 +60,8 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
     }
 
     public Mono<E> findById(I id) {
-        return repository.findById(id).map(this::toEntity);
+        return repository.findById(id).map(this::toEntity)
+                .switchIfEmpty(Mono.empty());
     }
 
     public Flux<E> findByExample(E entity) {
@@ -71,4 +73,5 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
         return repository.findAll()
                 .map(this::toEntity);
     }
+
 }

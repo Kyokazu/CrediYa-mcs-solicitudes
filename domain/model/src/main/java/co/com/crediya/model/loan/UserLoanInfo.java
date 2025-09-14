@@ -13,7 +13,8 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public class UserLoanInfo {
 
-    private UUID id;
+    private UUID userId;
+    private UUID loanId;
     private BigDecimal amount;
     private Long duration;
     private String email;

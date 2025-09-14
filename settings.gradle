@@ -30,3 +30,7 @@ include ':jwt-service'
 project(':jwt-service').projectDir = file('./infrastructure/driven-adapters/jwt-service')
 include ':aws-sqs'
 project(':aws-sqs').projectDir = file('./infrastructure/driven-adapters/aws-sqs')
+include ':sqs-listener'
+project(':sqs-listener').projectDir = file('./infrastructure/entry-points/sqs-listener')
+include ':metrics'
+project(':metrics').projectDir = file('./infrastructure/helpers/metrics')

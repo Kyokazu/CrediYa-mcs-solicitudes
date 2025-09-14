@@ -31,7 +31,8 @@ public class ManualLoanReviewUseCase {
         if ("ALL".equalsIgnoreCase(filter)) {
             return loanRepository.findAllPaged(page, size);
         }
-        return loanTypeRepository.getIdByName(filter)
+        return loanTypeRepository.getLoanTypeByName(filter)
+                .map(LoanType::getId)
                 .flatMapMany(typeId ->
                         loanRepository.findAllPaged(page, size)
                                 .filter(loan -> loan.getLoanTypeId().equals(typeId))
@@ -57,7 +58,8 @@ public class ManualLoanReviewUseCase {
                     );
 
                     return baseUserInfo.toBuilder()
-                            .id(loan.getId())
+                            .loanId(loan.getId())
+                            .userId(baseUserInfo.getUserId())
                             .amount(loan.getAmount())
                             .duration(loan.getDuration())
                             .loanType(loanType.getName())

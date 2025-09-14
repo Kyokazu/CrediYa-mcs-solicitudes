@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -23,36 +24,30 @@ public class LoanTypeReactiveRepositoryAdapter extends ReactiveAdapterOperations
 
     }
 
-    @Override
-    public Mono<UUID> getIdByName(String name) {
-        LoanType loan = LoanType.builder()
-                .name(name)
-                .build();
-        return super.findByExample(loan)
-                .next()
-                .map(LoanType::getId)
-                .doOnSuccess(id -> log.info("📌 Loan Type name= {} -> Loan Type id= {}", name, id));
 
-    }
-
-    @Override
-    public Mono<LoanType> getLoanTypeById(UUID id) {
+    public Mono<LoanType> getLoanTypeByIdOrName(UUID id, String name) {
         LoanType loan = LoanType.builder()
                 .id(id)
+                .name(name)
                 .build();
+
         return super.findByExample(loan)
                 .next()
-                .map(loanType -> {
-                    return LoanType.builder()
-                            .id(loanType.getId())
-                            .name(loanType.getName())
-                            .interestRate(loanType.getInterestRate())
-                            .automaticValidation(loanType.getAutomaticValidation())
-                            .maximumAmount(loanType.getMaximumAmount())
-                            .minimumAmount(loanType.getMinimumAmount())
-                            .build();
-                })
-                .doOnSuccess(name -> log.info("📌 Loan Type name= {} -> Loan Type id= {}", name, id));
+                .map(lt -> LoanType.builder()
+                        .id(lt.getId())
+                        .name(lt.getName())
+                        .interestRate(lt.getInterestRate())
+                        .automaticValidation(lt.getAutomaticValidation())
+                        .maximumAmount(lt.getMaximumAmount())
+                        .minimumAmount(lt.getMinimumAmount())
+                        .build());
+    }
 
+    public Mono<LoanType> getLoanTypeById(UUID id) {
+        return getLoanTypeByIdOrName(id, null);
+    }
+
+    public Mono<LoanType> getLoanTypeByName(String name) {
+        return getLoanTypeByIdOrName(null, name);
     }
 }

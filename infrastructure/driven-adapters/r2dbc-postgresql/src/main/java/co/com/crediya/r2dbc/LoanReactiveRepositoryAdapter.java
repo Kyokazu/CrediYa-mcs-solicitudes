@@ -37,4 +37,19 @@ public class LoanReactiveRepositoryAdapter extends ReactiveAdapterOperations<Loa
         return super.findById(id);
     }
 
+    @Override
+    public Mono<Loan> findByUserEmail(String email) {
+        return super.findAll()
+                .filter(loan -> loan.getEmail().equals(email))
+                .next();
+    }
+
+    @Override
+    public Flux<Loan> findAllByUserIdAndStatusId(UUID userId, UUID statusId) {
+        return super.findAll()
+                .filter(loan -> loan.getId().equals(userId)
+                        && loan.getLoanStatusId().equals(statusId));
+    }
+
+
 }

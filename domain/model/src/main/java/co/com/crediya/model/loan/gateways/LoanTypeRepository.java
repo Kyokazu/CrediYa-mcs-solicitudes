@@ -6,7 +6,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface LoanTypeRepository {
-    Mono<UUID> getIdByName(String name);
-
     Mono<LoanType> getLoanTypeById(UUID id);
+
+    Mono<LoanType> getLoanTypeByName(String name);
 }

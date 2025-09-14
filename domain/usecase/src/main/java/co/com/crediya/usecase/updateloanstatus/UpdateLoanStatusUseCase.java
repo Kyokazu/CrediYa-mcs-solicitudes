@@ -5,6 +5,8 @@ import co.com.crediya.model.loan.LoanType;
 import co.com.crediya.model.loan.UserLoanInfo;
 import co.com.crediya.model.loan.gateways.*;
 import co.com.crediya.usecase.manualloanreview.exception.NotConsultantRoleException;
+import co.com.crediya.usecase.requestloan.exception.InvalidTokenException;
+import co.com.crediya.usecase.requestloan.exception.LoanStatusNotFoundException;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -20,7 +22,7 @@ public class UpdateLoanStatusUseCase {
     private final LoanStatusRepository loanStatusRepository;
     private final JwtGateway jwtGateway;
     private final UserGateway userGateway;
-    private final NotificationQueueGateway notificationQueueGateway;
+    private final AWSSQSGateway queueGateway;
 
     public Mono<Loan> updateLoanStatus(Loan loan, String token) {
         return validateUserWithToken(token)
@@ -28,13 +30,27 @@ public class UpdateLoanStatusUseCase {
                 .flatMap(this::notifyAndReturnLoan);
     }
 
+    public Mono<Void> updateLoanStatusFromLambda(Loan loan) {
+        return getLoanStatusId(loan.getEmail())
+                .flatMap(statusId ->
+                        loanRepository.findById(loan.getId())
+                                .flatMap(foundLoan -> {
+                                    foundLoan.setId(loan.getId());
+                                    foundLoan.setLoanStatusId(statusId);
+                                    return loanRepository.saveLoan(foundLoan);
+                                })
+                )
+                .then();
+    }
+
     private Mono<Loan> getUpdatedLoan(Loan loan) {
-        return findUUIDWithStatusName(loan.getEmail())
+        return getLoanStatusId(loan.getEmail())
                 .flatMap(statusId ->
                         loanRepository.findById(loan.getId())
                                 .flatMap(existingLoan -> {
                                     existingLoan.setLoanStatusId(statusId);
                                     return loanRepository.saveLoan(existingLoan);
+
                                 })
                 );
     }
@@ -43,13 +59,14 @@ public class UpdateLoanStatusUseCase {
         return mapToUserLoanInfo(updatedLoan)
                 .flatMap(userLoanInfo -> {
                     String message = buildLoanStatusMessage(userLoanInfo);
-                    return notificationQueueGateway.sendMessage(userLoanInfo.getEmail(), message)
+                    return queueGateway.sendMessage(userLoanInfo.getEmail(), message)
                             .thenReturn(updatedLoan);
                 });
     }
 
-    private Mono<UUID> findUUIDWithStatusName(String statusName) {
-        return loanStatusRepository.getIdByName(statusName);
+    private Mono<UUID> getLoanStatusId(String statusName) {
+        return loanStatusRepository.getIdByName(statusName)
+                .switchIfEmpty(Mono.error(new LoanStatusNotFoundException("LoanStatus not found: " + statusName)));
     }
 
     private Mono<UserLoanInfo> mapToUserLoanInfo(Loan loan) {
@@ -82,7 +99,7 @@ public class UpdateLoanStatusUseCase {
 
     private Mono<Void> validateUserWithToken(String token) {
         return jwtGateway.validateToken(token)
-                .switchIfEmpty(Mono.error(new RuntimeException("Invalid token")))
+                .switchIfEmpty(Mono.error(new InvalidTokenException("Invalid token")))
                 .flatMap(userTokenInfo -> {
                     if (!"CONSULTANT".equalsIgnoreCase(userTokenInfo.getRole())) {
                         return Mono.error(new NotConsultantRoleException("Access denied: User does not have CONSULTANT role"));
@@ -110,11 +127,12 @@ public class UpdateLoanStatusUseCase {
 
     private String buildLoanStatusMessage(UserLoanInfo info) {
         return String.format(
-                "Your %s loan request for an amount of %s in a duration of %s months, has been %s.",
+                "Your %s loan request for an amount of %s in a duration of %s months with a Montly cost of %S, has been %s.",
                 info.getLoanType(),
                 info.getAmount(),
                 info.getDuration(),
-                info.getLoanStatus()
+                info.getLoanStatus(),
+                info.getMonthlyLoanPayment()
         );
     }
 

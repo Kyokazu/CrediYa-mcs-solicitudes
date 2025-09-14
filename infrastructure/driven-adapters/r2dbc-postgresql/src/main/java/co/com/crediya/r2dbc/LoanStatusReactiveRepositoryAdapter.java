@@ -31,8 +31,8 @@ public class LoanStatusReactiveRepositoryAdapter extends ReactiveAdapterOperatio
         return super.findByExample(loan)
                 .next()
                 .map(LoanStatus::getId)
+                .switchIfEmpty(Mono.empty())
                 .doOnSuccess(id -> log.info("📌 Loan Status name= {} -> Loan Status id= {}", name, id));
-
     }
 
     @Override
@@ -42,6 +42,7 @@ public class LoanStatusReactiveRepositoryAdapter extends ReactiveAdapterOperatio
         return super.findByExample(loan)
                 .next()
                 .map(LoanStatus::getName)
+                .switchIfEmpty(Mono.empty())
                 .doOnSuccess(name -> log.info("📌 Loan Status name= {} -> Loan Status id= {}", name, id));
 
     }

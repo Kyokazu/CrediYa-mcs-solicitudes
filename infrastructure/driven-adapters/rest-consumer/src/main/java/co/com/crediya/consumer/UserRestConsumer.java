@@ -33,6 +33,7 @@ public class UserRestConsumer implements UserGateway {
                 .retrieve()
                 .bodyToMono(UserInfoDTO.class)
                 .map(dto -> UserLoanInfo.builder()
+                        .userId(dto.getId())
                         .email(dto.getEmail())
                         .name(dto.getName())
                         .income(dto.getIncome())

@@ -86,7 +86,8 @@ public class Handler {
 
     private LoanDetailsDTO mapToLoanDetailsDTO(UserLoanInfo userLoanInfo) {
         LoanDetailsDTO dto = new LoanDetailsDTO();
-        dto.setId(userLoanInfo.getId());
+        dto.setUserId(userLoanInfo.getUserId());
+        dto.setLoanId(userLoanInfo.getLoanId());
         dto.setAmount(userLoanInfo.getAmount());
         dto.setDuration(userLoanInfo.getDuration());
         dto.setEmail(userLoanInfo.getEmail());

@@ -30,38 +30,32 @@ springdoc:
     path: "/api/doc/swagger-ui.html"
   api-docs:
     path: "/api/doc/api-docs"
-
 routes:
   paths:
     loan: "/api/v1/solicitud"
-
-
 adapters:
   users:
-    baseUrl: "http://localhost:8080" #http://autenticacion:8080
+    baseUrl: "http://localhost:8080"
     timeoutMs: "3000"
     userByIdentification: "/api/v1/users/{identification}"
     userByEmail: "/api/v1/user/{email}"
     validateToken: "/api/v1/auth"
-
   r2dbc:
-    host: "localhost" #postgres17_db
+    host: "localhost"
     port: 5432
     database: "msc_solicitudes"
     schema: "public"
     username: "admin"
     password: "adminpassword"
-
 jwt:
-  secret: ${JWT_SECRET}
-
+  secret: "${JWT_SECRET}"
 aws:
-  access-key: ${AWS_ACCESS_KEY_ID}
-  secret-key: ${AWS_SECRET_ACCESS_KEY}
+  access-key: "${AWS_ACCESS_KEY_ID}"
+  secret-key: "${AWS_SECRET_ACCESS_KEY}"
   sqs:
-    queue-url: ${AWS_SQS_URL}
-    region: ${AWS_REGION}
-
+    notification-queue-url: "${AWS_NOTIFICATION_SQS_URL}"
+    debt-capacity-queue-url: "${AWS_DEBT_CAPACITY_SQS_URL}"
+    region: "${AWS_REGION}"
 resilience4j:
   circuitbreaker:
     instances:
@@ -83,3 +77,12 @@ resilience4j:
         slidingWindowSize: 10
         minimumNumberOfCalls: 10
         waitDurationInOpenState: "10s"
+entrypoint:
+  sqs:
+    region: "${AWS_REGION}"
+    endpoint:
+    queueUrl: "${AWS_DEBT_CAPACITY_RESPONSE_QUEUE_URL}"
+    waitTimeSeconds: 20
+    maxNumberOfMessages: 10
+    visibilityTimeoutSeconds: 10
+    numberOfThreads: 1

@@ -14,4 +14,7 @@ public interface LoanRepository {
 
     Mono<Loan> findById(UUID id);
 
+    Mono<Loan> findByUserEmail(String email);
+
+    Flux<Loan> findAllByUserIdAndStatusId(UUID userId, UUID statusId);
 }
