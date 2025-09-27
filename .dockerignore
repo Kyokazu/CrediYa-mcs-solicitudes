@@ -30,7 +30,9 @@ Thumbs.db
 .git
 .gitignore
 
+
 # =====================
 # Otros
 # =====================
 *.class
+.env

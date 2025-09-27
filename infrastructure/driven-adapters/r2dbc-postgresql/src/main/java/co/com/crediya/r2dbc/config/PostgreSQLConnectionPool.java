@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
 
+import static io.r2dbc.postgresql.client.SSLMode.REQUIRE;
+
 @Configuration
 public class PostgreSQLConnectionPool {
     /* Change these values for your project */
@@ -17,15 +19,16 @@ public class PostgreSQLConnectionPool {
     public static final int MAX_IDLE_TIME = 30;
     public static final int DEFAULT_PORT = 5432;
 
-	@Bean
-	public ConnectionPool getConnectionConfig(PostgresqlConnectionProperties properties) {
-		PostgresqlConnectionConfiguration dbConfiguration = PostgresqlConnectionConfiguration.builder()
+    @Bean
+    public ConnectionPool getConnectionConfig(PostgresqlConnectionProperties properties) {
+        PostgresqlConnectionConfiguration dbConfiguration = PostgresqlConnectionConfiguration.builder()
                 .host(properties.host())
                 .port(properties.port())
                 .database(properties.database())
                 .schema(properties.schema())
                 .username(properties.username())
                 .password(properties.password())
+                .sslMode(REQUIRE)
                 .build();
 
         ConnectionPoolConfiguration poolConfiguration = ConnectionPoolConfiguration.builder()
@@ -37,6 +40,6 @@ public class PostgreSQLConnectionPool {
                 .validationQuery("SELECT 1")
                 .build();
 
-		return new ConnectionPool(poolConfiguration);
-	}
+        return new ConnectionPool(poolConfiguration);
+    }
 }

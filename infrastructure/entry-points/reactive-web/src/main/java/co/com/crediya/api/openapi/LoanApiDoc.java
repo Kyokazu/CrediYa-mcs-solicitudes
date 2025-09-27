@@ -2,9 +2,7 @@ package co.com.crediya.api.openapi;
 
 import co.com.crediya.api.dto.ApiErrorDTO;
 import co.com.crediya.api.dto.LoanDTO;
-import co.com.crediya.api.dto.LoanDetailsDTO;
 import lombok.experimental.UtilityClass;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;

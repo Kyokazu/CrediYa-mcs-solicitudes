@@ -13,18 +13,11 @@ public class AwsSqsConfig {
 
     @Value("${aws.sqs.region}")
     private String region;
-    @Value("${aws.access-key}")
-    private String accessKey;
-    @Value("${aws.secret-key}")
-    private String secretKey;
 
     @Bean
     public SqsAsyncClient sqsAsyncClient() {
         return SqsAsyncClient.builder()
                 .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKey, secretKey)
-                ))
                 .build();
     }
 }
